@@ -1,0 +1,53 @@
+name: audacious gtk build
+
+on:
+  push:
+    paths:
+      - '.github/workflows/build.yml' 
+
+jobs:
+  debian-container:
+    runs-on: ubuntu-latest
+    container: debian:stable
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: clone audacious repo
+        run: |
+              apt-get update && apt-get install -y  gcc autoconf automake gettext libtool cmake pkg-config  libgtk-3-dev  git locales g++ zip
+              git clone https://github.com/audacious-media-player/audacious.git --depth=1
+              cd audacious
+              ./autogen.sh
+              mkdir pkg
+              ./configure --disable-qt --enable-gtk  
+              make
+              make install
+              ./configure --disable-qt --enable-gtk --prefix=$PWD/pkg
+              make install
+              zip -r aud.zip pkg/
+              upload=$(realpath aud.zip)
+              echo "FILE1=${upload}" >> $GITHUB_ENV
+              
+              # building plugins need audacious installed so two configure
+              
+              cd ..
+              apt install -y meson libxml2-dev libjson-glib-dev libflac-dev libvorbis-dev libasound2-dev  libopusfile-dev libogg-dev libmpg123-dev libwavpack-dev libavcodec-dev libavformat-dev libavutil-dev libpipewire-0.3-dev libspa-0.2-dev libneon27-dev
+              git clone  https://github.com/audacious-media-player/audacious-plugins.git --depth=1
+              cd audacious-plugins
+              meson build -Dqt=false
+              meson compile -C build
+               meson install -C build --destdir pkg
+              zip -r aud-plugins.zip build/pkg/
+              upload=$(realpath aud-plugins.zip)
+              echo "FILE2=${upload}" >> $GITHUB_ENV
+              
+      - name: Create GitHub Release and Upload ZIP
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.run_id }}
+          files: |
+            ${{ env.FILE1 }}
+            ${{ env.FILE2 }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
