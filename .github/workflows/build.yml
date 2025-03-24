@@ -14,7 +14,7 @@ jobs:
       - name: Install Dependencies
         run: |
           xbps-install -Sy gcc autoconf automake gettext libtool cmake pkg-config \
-            gtk+3-devel git  g++ zip meson libxml2-devel  alsa-lib-devel  ffmpeg6-devel \
+            gtk+3-devel git zip meson libxml2-devel  alsa-lib-devel  ffmpeg6-devel \
 
       - name: Build Audacious
         run: |
