@@ -4,30 +4,26 @@ on:
   push:
     paths:
       - '.github/workflows/build.yml' 
-
 jobs:
-  debian-container:
-    runs-on: ubuntu-latest
-    container: ghcr.io/void-linux/void-glibc   
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: clone audacious repo
-        run: |
-              xbps-install -Sy  gcc autoconf automake gettext libtool cmake pkg-config  libgtk-3-dev  git locales g++ zip
-              git clone https://github.com/audacious-media-player/audacious.git --depth=1
-              cd audacious
-              ./autogen.sh
-              mkdir pkg
-              ./configure --disable-qt --enable-gtk  
-              make
-              make install
-              ./configure --disable-qt --enable-gtk --prefix=$PWD/pkg
-              make install
-              zip -r aud.zip pkg/
-              upload=$(realpath aud.zip)
-              echo "FILE1=${upload}" >> $GITHUB_ENV
+  runs-on: ubuntu-latest
+  steps:
+   - name: Checkout Repository
+     uses: actions/checkout@v4
+  container: ghcr.io/void-linux/void-glibc   
+run: |
+          xbps-install -Sy  gcc autoconf automake gettext libtool cmake pkg-config  libgtk-3-dev  git locales g++ zip
+          git clone https://github.com/audacious-media-player/audacious.git --depth=1
+          cd audacious
+          ./autogen.sh
+          mkdir pkg
+          ./configure --disable-qt --enable-gtk  
+          make
+          make install
+          ./configure --disable-qt --enable-gtk --prefix=$PWD/pkg
+          make install
+          zip -r aud.zip pkg/
+          upload=$(realpath aud.zip)
+          echo "FILE1=${upload}" >> $GITHUB_ENV
               
               # building plugins need audacious installed so two configure
               
