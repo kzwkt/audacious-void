@@ -14,10 +14,7 @@ jobs:
       - name: Install Dependencies
         run: |
           xbps-install -Sy gcc autoconf automake gettext libtool cmake pkg-config \
-            libgtk-3-dev git locales g++ zip meson libxml2-devel json-glib-devel \
-            flac-devel libvorbis-devel alsa-lib-devel opusfile-devel \
-            libogg-devel mpg123-devel wavpack-devel ffmpeg-devel \
-            pipewire-devel spa-devel neon-devel
+            gtk+3-devel git locales g++ zip meson libxml2-devel  alsa-lib-devel  ffmpeg6-devel \
 
       - name: Build Audacious
         run: |
